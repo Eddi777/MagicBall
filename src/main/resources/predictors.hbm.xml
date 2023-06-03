@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="ru.sharipov.entity.Predictor" table="PREDICTORS">
+        <id name="predictorId" type="long" column="PREDICTOR_ID">
+            <column name="PREDICTOR_ID" />
+        </id>
+        <property name="name" column="NAME"
+                  type="String">
+        </property>
+        <property name="comment" column="COMMENT"
+                  type="String">
+        </property>
+        <property name="host" column="HOST"
+                  type="String">
+        </property>
+        <property name="checkData" column="CHECK_DATA"
+                  type="String">
+        </property>
+    </class>
+
+</hibernate-mapping>

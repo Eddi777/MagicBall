@@ -5,19 +5,19 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sharipov.dto.PredictionMap;
+import ru.sharipov.entity.Predictor;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AstraZetPredictorImpl implements Predictor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AstraZetPredictorImpl.class);
+public class AstraZetPredictorImplService implements PredictorService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AstraZetPredictorImplService.class);
     private static final String PREDICTOR_NAME = "AstroZet";
     private static final String ENTRY_URL = "https://astrozet.net/horoscope/week";
     private static final String CHECK_STRING = "Астрологический прогноз на неделю, точный гороскоп бесплатно";
@@ -25,8 +25,9 @@ public class AstraZetPredictorImpl implements Predictor {
 
 
     @Override
-    public PredictionMap getPredictions() {
+    public PredictionMap getPredictions(Predictor predictor) {
         LOGGER.info("Start {}", PREDICTOR_NAME);
+        LOGGER.info(predictor.getHost());
         WebDriverManager.chromedriver().setup();
         WebDriver driver = new ChromeDriver();
 
