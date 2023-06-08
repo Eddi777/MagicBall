@@ -3,13 +3,15 @@ package ru.sharipov.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Set;
 
 @Entity
 @Table(name = "PREDICTORS")
@@ -27,8 +29,8 @@ public class Predictor {
     private String host; //’ост источника
     @Column(name = "CHECK_DATA")
     private String checkData; // онтрольна€ строка дл€ проверки правильности ответа источника (напр Title)
-//    @OneToMany(mappedBy = "valueId", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<PredictorValue> values;
+    @OneToMany(mappedBy = "predictor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<PredictorValue> values;
 
     public long getPredictorId() {
         return predictorId;
@@ -70,11 +72,23 @@ public class Predictor {
         this.checkData = checkData;
     }
 
-//    public List<PredictorValue> getValues() {
-//        return values;
-//    }
-//
-//    public void setValues(List<PredictorValue> values) {
-//        this.values = values;
-//    }
+    public Set<PredictorValue> getValues() {
+        return values;
+    }
+
+    public void setValues(Set<PredictorValue> values) {
+        this.values = values;
+    }
+
+    @Override
+    public String toString() {
+        return "Predictor{" +
+                "predictorId=" + predictorId +
+                ", name='" + name + '\'' +
+                ", comment='" + comment + '\'' +
+                ", host='" + host + '\'' +
+                ", checkData='" + checkData + '\'' +
+                ", values=" + Arrays.toString(values.toArray()) +
+                '}';
+    }
 }

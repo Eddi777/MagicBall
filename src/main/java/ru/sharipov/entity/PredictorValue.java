@@ -19,14 +19,14 @@ public class PredictorValue {
     @Column(name = "VALUE_ID")
     private Long valueId; //»дентификатор
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "name", nullable = false)
+    @JoinColumn(name = "PREDICTOR_ID", nullable = false)
     private Predictor predictor; //”казатель на предиктор
     @Column(name="ENDPOINT")
     private String endpoint; //Ёндпоинт (полный url) дл€ дополнительного запроса (при необходимости)
     @Column(name="REGEX", nullable = false)
     private String regex; //–егул€рное выражение дл€ получени€ нужных данных
-    @Column(name="TAG", nullable = false)
-    private String tag; //“эги дл€ предсказани€ (разделитель - зап€та€)
+    @Column(name="TAGS", nullable = false)
+    private String tags; //“эги дл€ предсказани€ (разделитель - зап€та€)
 
     public Long getValueId() {
         return valueId;
@@ -60,11 +60,21 @@ public class PredictorValue {
         this.regex = regex;
     }
 
-    public String getTag() {
-        return tag;
+    public String getTags() {
+        return tags;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    @Override
+    public String toString() {
+        return "PredictorValue{" +
+                "valueId=" + valueId +
+                ", endpoint='" + endpoint + '\'' +
+                ", regex='" + regex + '\'' +
+                ", tags='" + tags + '\'' +
+                '}';
     }
 }

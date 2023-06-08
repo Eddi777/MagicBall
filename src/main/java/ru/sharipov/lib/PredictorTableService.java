@@ -5,6 +5,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 import ru.sharipov.entity.Predictor;
+import ru.sharipov.entity.PredictorValue;
+
+import java.util.Optional;
 
 public class PredictorTableService {
 
@@ -12,16 +15,20 @@ public class PredictorTableService {
 
     public PredictorTableService() {
         sessionFactory = new Configuration()
+                //TODO Add all Entities
                 .addAnnotatedClass(Predictor.class)
-//                .addPackage("ru.sharipov.entity")
+                .addAnnotatedClass(PredictorValue.class)
                 .buildSessionFactory();
     }
 
-    public Predictor getPredictor(String name) {
+    public Optional<Predictor> getPredictor(String name) {
+        String hql = "FROM Predictor WHERE name =:name";
+        Optional<Predictor> result;
         try (Session session = sessionFactory.openSession()) {
-            Query<Predictor> query = session.createQuery("FROM predictor", Predictor.class);
-            System.out.println(query.getSingleResult().getComment());
-            return query.getSingleResult();
+            Query<Predictor> query = session.createQuery(hql, Predictor.class);
+            query.setParameter("name", name);
+            result = Optional.of(query.getSingleResult());
         }
+        return result;
     }
 }
