@@ -21,13 +21,13 @@ public class Predictor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PREDICTOR_ID", nullable = false)
     private long predictorId; //Идентификатор сайта для предсказания
-    @Column(name = "NAME", unique = true, nullable = false)
+    @Column(name = "NAME", unique = true, nullable = false, length = 100)
     private String name; //Имя астропрогноза, уникальное значение
-    @Column(name = "COMMENT")
+    @Column(name = "COMMENT", length = 500)
     private String comment; //комментарий
-    @Column(name = "HOST", nullable = false)
+    @Column(name = "HOST", nullable = false, length = 50)
     private String host; //Хост источника
-    @Column(name = "CHECK_DATA")
+    @Column(name = "CHECK_DATA", length = 500)
     private String checkData; //Контрольная строка для проверки правильности ответа источника (напр Title)
     @OneToMany(mappedBy = "predictor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<PredictorValue> values;

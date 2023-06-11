@@ -7,4 +7,5 @@ import ru.sharipov.entity.User;
 public interface PredictorService {
 
     PredictionMap getPredictions(Predictor predictor, User user);
+    String getPredictionName();
 }

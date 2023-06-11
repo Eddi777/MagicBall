@@ -1,17 +1,17 @@
 package ru.sharipov.dto;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import ru.sharipov.entity.Request;
+
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-public class Prediction {
+public class PredictionDto {
 
     private String predictor;
     private String prediction;
     private Set<String> tags = new HashSet<>();
+    private Request request;
 
     public String getPredictor() {
         return predictor;
@@ -39,6 +39,18 @@ public class Prediction {
 
     public void addAllTags(Set<String> tags) {
         this.tags.addAll(tags);
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    public void setRequest(Request request) {
+        this.request = request;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     @Override

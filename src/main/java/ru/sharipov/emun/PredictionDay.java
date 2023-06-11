@@ -1,14 +1,16 @@
 package ru.sharipov.emun;
 
+import java.util.Arrays;
+
 public enum PredictionDay {
-    D0 ("#Day0"),
-    D1 ("#Day1"),
-    D2 ("#Day2"),
-    D3 ("#Day3"),
-    D4 ("#Day4"),
-    D5 ("#Day5"),
-    D6 ("#Day6"),
-    DE ("#Error"); //Error
+    D0 ("#D0"),
+    D1 ("#D1"),
+    D2 ("#D2"),
+    D3 ("#D3"),
+    D4 ("#D4"),
+    D5 ("#D5"),
+    D6 ("#D6"),
+    DI("#Ignore");
 
     private final String tag;
     PredictionDay(String tag) {
@@ -17,5 +19,11 @@ public enum PredictionDay {
 
     public String getTag(){
         return tag;
+    }
+    public static PredictionDay encode(String text) {
+        return Arrays.stream(PredictionDay.values())
+                .filter(p -> p.getTag().equals(text))
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("Ошибка дешифровки PredictionDay"));
     }
 }

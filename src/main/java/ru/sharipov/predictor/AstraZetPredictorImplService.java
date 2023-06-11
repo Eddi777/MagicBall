@@ -1,5 +1,6 @@
 package ru.sharipov.predictor;
 
+import com.google.auto.service.AutoService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,7 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.sharipov.dto.Prediction;
+import ru.sharipov.dto.PredictionDto;
 import ru.sharipov.dto.PredictionMap;
 import ru.sharipov.emun.PredictionDay;
 import ru.sharipov.entity.Predictor;
@@ -27,6 +28,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@AutoService(PredictorService.class)
 public class AstraZetPredictorImplService extends CommonPredictorService {
     private static final String PREDICTOR = "AstroZet";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -36,10 +38,14 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
     @Override
     public PredictionMap getPredictions(Predictor predictor, User user) {
         String page = getPageData(predictor, user);
-        if (page == "") {
+        if (page.equals("")) {
             return new PredictionMap();
         }
         return parsePage(page, predictor);
+    }
+    @Override
+    public String getPredictionName() {
+        return PREDICTOR;
     }
 
     private String getPageData(Predictor predictor, User user) {
@@ -105,7 +111,7 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
             }
             String dateText = e.getElementsByClass("d-block forecast-date")
                     .iterator().next().toString();
-            PredictionDay day = PredictionDay.DE;
+            PredictionDay day = PredictionDay.DI;
             if (dateText.contains(LocalDate.now().format(FORMATTER_PARSE))) {
                 day = PredictionDay.D0;
             } else if (dateText.contains(LocalDate.now().plusDays(1).format(FORMATTER_PARSE))) {
@@ -121,24 +127,25 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
             } else if (dateText.contains(LocalDate.now().plusDays(6).format(FORMATTER_PARSE))) {
                 day = PredictionDay.D6;
             }
-            if (day == PredictionDay.DE) {
+            if (day == PredictionDay.DI) {
                 continue;
             }
-            List<Prediction> preds = new ArrayList<>();
+            List<PredictionDto> preds = new ArrayList<>();
             for (PredictorValue value : predictor.getValues()) {
                 Pattern pattern = Pattern.compile(value.getRegex());
                 Matcher matcher = pattern.matcher(e.toString());
                 while (matcher.find()) {
-                    Prediction pred = new Prediction();
+                    PredictionDto pred = new PredictionDto();
                     pred.setPredictor(PREDICTOR);
                     pred.addTag(day.getTag());
+                    pred.addTag("#" + PREDICTOR);
                     pred.addAllTags(Set.of(value.getTags().split(",")));
                     pred.setPrediction(matcher.group(1));
                     preds.add(pred);
                 }
             }
             if (!preds.isEmpty()) {
-                map.put(day, preds);
+                map.addAll(day, preds);
             }
         }
         return map;
