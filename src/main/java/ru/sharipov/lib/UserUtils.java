@@ -15,6 +15,7 @@ import ru.sharipov.entity.User;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,9 +45,12 @@ public class UserUtils {
             user.setBirthCityTimezone(neighbour.getBirthCityTimezone());
         } else {
             //«аполнение данных запросами
-            Predictor predictor = predictorService.getByName(PREDICTOR)
-                    .orElseThrow(() -> new RuntimeException(String.format("Ќе найден предиктор дл€ заполнени€ " +
-                            "координат населенного пункта и часового по€са=%s", PREDICTOR)));
+            List<Predictor> predictors = predictorService.getAllByName(PREDICTOR);
+            if (predictors.isEmpty()) {
+                throw new RuntimeException(String.format("Ќе найден предиктор дл€ заполнени€ " +
+                        "координат населенного пункта и часового по€са=%s", PREDICTOR));
+            }
+            Predictor predictor = predictors.iterator().next();
             String[] coordinates = getCoordinates(predictor, user);
             String latitude = coordinates[0];
             String longitude = coordinates[1];
@@ -61,7 +65,6 @@ public class UserUtils {
 
     /**
      * ѕерва€ реализаци€ только за счет долготы, без учета границ субъектов.
-     *
      */
     private String getTimeOffset(String latitude, String longitude) {
         double naturalOffset = Double.parseDouble(longitude) * 24 / 360;

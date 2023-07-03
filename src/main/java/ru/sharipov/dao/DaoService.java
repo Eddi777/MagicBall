@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface DaoService<T> {
 
     Optional<T> getById(long id);
-    Optional<T> getByName(String name);
+    List<T> getAllByName(String name);
 
     List<T> getAll();
 
@@ -18,15 +18,5 @@ public interface DaoService<T> {
     void delete(T t);
 
     Optional<T> getAnyByParameters(Map<String, String> parameters);
-
-    default String collectHqlWhereByParameters(Map<String, String> parameters){
-        StringBuilder sb = new StringBuilder();
-        parameters.keySet().forEach(key -> {
-            sb.append((sb.length() == 0) ? "" : " AND ");
-            sb.append(key);
-            sb.append("=");
-            sb.append(parameters.get(key));
-        });
-    return sb.toString();
-    }
+    List<T> getAllByParameters(Map<String, String> parameters);
 }

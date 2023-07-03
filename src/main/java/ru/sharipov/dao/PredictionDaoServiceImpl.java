@@ -9,11 +9,12 @@ import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.Request;
 import ru.sharipov.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class PredictionDaoServiceImpl implements DaoService<Prediction> {
+public class PredictionDaoServiceImpl extends CommonDaoService<Prediction> {
 
     private static SessionFactory sessionFactory;
 
@@ -47,8 +48,8 @@ public class PredictionDaoServiceImpl implements DaoService<Prediction> {
     }
 
     @Override
-    public Optional<Prediction> getByName(String name) {
-        throw new RuntimeException("Функционал PredictionDaoServiceImpl.getByName не реализован");
+    public List<Prediction> getAllByName(String name) {
+        throw new RuntimeException("Функционал PredictionDaoServiceImpl.getAllByName не реализован");
     }
 
     @Override
@@ -86,5 +87,21 @@ public class PredictionDaoServiceImpl implements DaoService<Prediction> {
     @Override
     public Optional<Prediction> getAnyByParameters(Map<String, String> parameters) {
         throw new RuntimeException("Функционал PredictionDaoServiceImpl.getAny... не реализован");
+    }
+
+    @Override
+    public List<Prediction> getAllByParameters(Map<String, String> parameters) {
+        List<Prediction> res = null;
+        String hql = "FROM Prediction WHERE :params";
+        String sWhere = collectHqlWhereByParameters(parameters);
+        try (Session session = sessionFactory.openSession()) {
+            Query<Prediction> query = session.createQuery(hql, Prediction.class);
+            query.setParameter("params", sWhere);
+            res = query.getResultList();
+        } catch (Exception e) {
+            System.out.println("Ошибка при поиске User по параметрам=" + sWhere);
+            e.printStackTrace();
+        }
+        return (res == null) ? new ArrayList<>() : res;
     }
 }

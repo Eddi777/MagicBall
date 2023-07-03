@@ -7,6 +7,7 @@ import ru.sharipov.entity.Predictor;
 import ru.sharipov.enums.TextSentiment;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public abstract class CommonPredictorService implements PredictorService {
         PredictionDay day = PredictionDay.DI;
         for (String tag: tags) {
             try {
-                day = PredictionDay.encode(tag);
+                day = PredictionDay.encode(tag, day);
                 break;
             } catch (RuntimeException ignore) {
             }

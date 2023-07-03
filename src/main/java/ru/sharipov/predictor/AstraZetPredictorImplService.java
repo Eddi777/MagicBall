@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 public class AstraZetPredictorImplService extends CommonPredictorService {
 
     private static final UserUtils userUtils = new UserUtils();
-    private static final String PREDICTOR = "AstroZet";
+    private static final String PREDICTOR = "AstraZet";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter FORMATTER_PARSE = DateTimeFormatter.ofPattern("dd MM yyyy");
 
@@ -47,7 +47,7 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
     }
 
     @Override
-    public String getPredictionName() {
+    public String getPredictorName() {
         return PREDICTOR;
     }
 

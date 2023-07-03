@@ -5,17 +5,15 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 import ru.sharipov.entity.Prediction;
-import ru.sharipov.entity.Predictor;
-import ru.sharipov.entity.PredictorValue;
 import ru.sharipov.entity.Request;
 import ru.sharipov.entity.User;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class UserDaoServiceImpl implements DaoService<User> {
+public class UserDaoServiceImpl extends CommonDaoService<User> {
 
     private static SessionFactory sessionFactory;
     private static DaoService<User> instance;
@@ -50,18 +48,18 @@ public class UserDaoServiceImpl implements DaoService<User> {
     }
 
     @Override
-    public Optional<User> getByName(String name) {
-        Optional<User> user = Optional.empty();
+    public List<User> getAllByName(String name) {
+        List<User> users = new ArrayList<>();
         String hql = "FROM User WHERE name =:name";
         try (Session session = sessionFactory.openSession()) {
             Query<User> query = session.createQuery(hql, User.class);
             query.setParameter("name", name);
-            user = Optional.of(query.getSingleResult());
+            users.addAll(query.getResultList());
         } catch (Exception e) {
-            System.out.println("Ошибка при обновлении данных пользователя по имени=" + name);
+            System.out.println("Ошибка при получении списка пользователей по имени=" + name);
             e.printStackTrace();
         }
-        return user;
+        return users;
     }
 
     @Override
@@ -108,7 +106,7 @@ public class UserDaoServiceImpl implements DaoService<User> {
     }
 
     @Override
-    public Optional<User> getAnyByParameters (Map<String, String> parameters) {
+    public Optional<User> getAnyByParameters(Map<String, String> parameters) {
         Optional<User> user = Optional.empty();
         String hql = "FROM User WHERE :params";
         String sWhere = collectHqlWhereByParameters(parameters);
@@ -121,5 +119,21 @@ public class UserDaoServiceImpl implements DaoService<User> {
             e.printStackTrace();
         }
         return user;
+    }
+
+    @Override
+    public List<User> getAllByParameters(Map<String, String> parameters) {
+        List<User> users = null;
+        String hql = "FROM User WHERE :params";
+        String sWhere = collectHqlWhereByParameters(parameters);
+        try (Session session = sessionFactory.openSession()) {
+            Query<User> query = session.createQuery(hql, User.class);
+            query.setParameter("params", sWhere);
+            users = query.getResultList();
+        } catch (Exception e) {
+            System.out.println("Ошибка при поиске User по параметрам=" + sWhere);
+            e.printStackTrace();
+        }
+        return (users == null) ? new ArrayList<>() : users;
     }
 }

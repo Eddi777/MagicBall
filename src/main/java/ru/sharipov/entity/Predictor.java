@@ -29,10 +29,15 @@ public class Predictor {
     private String host; //Хост источника
     @Column(name = "CHECK_DATA", length = 500)
     private String checkData; //Контрольная строка для проверки правильности ответа источника (напр Title)
-    @Column(name="IS_SUPPORT_LINK", length = 1)
-    private String isSupport;
+    @Column(name="IS_SUPPORT_LINK", length = 1, nullable = false)
+    private String isSupport; //"Y" - данный предиктор используется для вспомогательных задач (не получение аспекта предсказания)
+    @Column(name="PREDICTOR_SERVICE_NAME", length=50, nullable = false)
+    private String predictorServiceName; //Имя PredictorService с которым работает предиктор
+    @Column(name="WEIGHT", length=50, nullable = false)
+    private int weight; //Вес предиктора при вычислении ответа пользователю
     @OneToMany(mappedBy = "predictor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<PredictorValue> values;
+
 
     public long getPredictorId() {
         return predictorId;
@@ -90,6 +95,21 @@ public class Predictor {
         this.isSupport = (isSupport) ? "Y" : "N";
     }
 
+    public String getPredictorServiceName() {
+        return predictorServiceName;
+    }
+
+    public void setPredictorServiceName(String predictorServiceName) {
+        this.predictorServiceName = predictorServiceName;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
 
     @Override
     public String toString() {
@@ -99,6 +119,9 @@ public class Predictor {
                 ", comment='" + comment + '\'' +
                 ", host='" + host + '\'' +
                 ", checkData='" + checkData + '\'' +
+                ", isSupport='" + isSupport + '\'' +
+                ", predictorServiceName='" + predictorServiceName + '\'' +
+                ", weight=" + weight +
                 ", values=" + Arrays.toString(values.toArray()) +
                 '}';
     }

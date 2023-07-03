@@ -1,6 +1,5 @@
 package ru.sharipov.dto;
 
-import ru.sharipov.TextClassifier;
 import ru.sharipov.entity.Request;
 import ru.sharipov.enums.TextSentiment;
 
@@ -16,6 +15,7 @@ public class PredictionDto {
     private Request request;
 
     private TextSentiment sentiment;
+
     public String getPredictor() {
         return predictor;
     }

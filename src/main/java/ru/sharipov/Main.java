@@ -11,14 +11,16 @@ import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.Request;
 import ru.sharipov.entity.User;
 import ru.sharipov.lib.PredictionMapper;
-import ru.sharipov.lib.UserUtils;
 import ru.sharipov.predictor.PredictorService;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class Main {
@@ -71,15 +73,20 @@ public class Main {
 
         final PredictionMap map = new PredictionMap();
 
-        predictors.forEach(p -> {
-            Predictor predictor = predictorService.getByName(p.getPredictionName())
-                    .orElseThrow(() -> new RuntimeException(String.format("Не найден предиктор=%s", p.getPredictionName())));
-            if (!predictor.isSupportLink()) {
-                final PredictionMap predMap = p.getPredictions(predictor, user);
-                map.merge(predMap);
-            }
-        });
+        predictors.stream()
+//                .filter(p -> p.getPredictorName().equals("BreusSchool"))
+                .forEach(ps -> {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("predictor_service_name", ps.getPredictorName());
 
+                    predictorService.getAllByParameters(params).stream()
+                            .map(Predictor::getPredictorId)
+                            .map(predictorService::getById)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .map(p -> ps.getPredictions(p, user))
+                            .forEach(map::merge);
+                });
         return map;
     }
 

@@ -4,17 +4,15 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
-import ru.sharipov.entity.Prediction;
 import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.PredictorValue;
-import ru.sharipov.entity.Request;
-import ru.sharipov.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class PredictorDaoServiceImpl implements DaoService<Predictor>{
+public class PredictorDaoServiceImpl extends CommonDaoService<Predictor> {
 
     private static SessionFactory sessionFactory;
     private static DaoService<Predictor> instance;
@@ -37,17 +35,28 @@ public class PredictorDaoServiceImpl implements DaoService<Predictor>{
 
     @Override
     public Optional<Predictor> getById(long id) {
-        return Optional.empty();
+        Optional<Predictor> predictor = Optional.empty();
+        try (Session session = sessionFactory.openSession()) {
+            Predictor obj = session.get(Predictor.class, id);
+            predictor = Optional.of(obj);
+        } catch (Exception e) {
+            System.out.println("Ошибка при обновлении данных предиктора по ID=" + id);
+            e.printStackTrace();
+        }
+        return predictor;
     }
 
     @Override
-    public Optional<Predictor> getByName(String name) {
+    public List<Predictor> getAllByName(String name) {
         String hql = "FROM Predictor WHERE name =:name";
-        Optional<Predictor> result;
+        List<Predictor> result = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
             Query<Predictor> query = session.createQuery(hql, Predictor.class);
             query.setParameter("name", name);
-            result = Optional.of(query.getSingleResult());
+            result.addAll(query.getResultList());
+        } catch (Exception e) {
+            System.out.println("Ошибка при получении списка предикторов по имени=" + name);
+            e.printStackTrace();
         }
         return result;
     }
@@ -76,5 +85,28 @@ public class PredictorDaoServiceImpl implements DaoService<Predictor>{
     @Override
     public Optional<Predictor> getAnyByParameters(Map<String, String> parameters) {
         throw new RuntimeException("Функционал PredictorDaoServiceImpl.getAny... не реализован");
+    }
+
+
+    /**
+     * Прим: Возвращает список Предикторов без Вэльюс
+     *
+     * @param parameters - Мар с перечнем параметров для выделения нужных предикторов
+     * @return - список Предикторов
+     */
+    @Override
+    public List<Predictor> getAllByParameters(Map<String, String> parameters) {
+        List<Predictor> res = null;
+        String sWhere = collectHqlWhereByParameters(parameters);
+        String sql = "SELECT * FROM PREDICTORS WHERE " + sWhere;
+
+        try (Session session = sessionFactory.openSession()) {
+            Query<Predictor> query = session.createNativeQuery(sql, Predictor.class);
+            res = query.getResultList();
+        } catch (Exception e) {
+            System.out.println("Ошибка при поиске User по параметрам: " + sWhere);
+            e.printStackTrace();
+        }
+        return (res == null) ? new ArrayList<>() : res;
     }
 }

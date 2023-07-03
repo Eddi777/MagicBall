@@ -9,11 +9,12 @@ import ru.sharipov.entity.Prediction;
 import ru.sharipov.entity.Request;
 import ru.sharipov.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class RequestDaoServiceImpl implements DaoService<Request> {
+public class RequestDaoServiceImpl extends CommonDaoService<Request> {
 
     private static SessionFactory sessionFactory;
     private static DaoService<Request> instance;
@@ -45,8 +46,8 @@ public class RequestDaoServiceImpl implements DaoService<Request> {
     }
 
     @Override
-    public Optional<Request> getByName(String name) {
-        throw new RuntimeException("Функционал RequestDaoServiceImpl.getByName не реализован");
+    public List<Request> getAllByName(String name) {
+        throw new RuntimeException("Функционал RequestDaoServiceImpl.getAllByName не реализован");
     }
 
     @Override
@@ -84,5 +85,21 @@ public class RequestDaoServiceImpl implements DaoService<Request> {
     @Override
     public Optional<Request> getAnyByParameters(Map<String, String> parameters) {
         throw new RuntimeException("Функционал RequestDaoServiceImpl.delete не реализован");
+    }
+
+    @Override
+    public List<Request> getAllByParameters(Map<String, String> parameters) {
+        List<Request> res = null;
+        String hql = "FROM Request WHERE :params";
+        String sWhere = collectHqlWhereByParameters(parameters);
+        try (Session session = sessionFactory.openSession()) {
+            Query<Request> query = session.createQuery(hql, Request.class);
+            query.setParameter("params", sWhere);
+            res = query.getResultList();
+        } catch (Exception e) {
+            System.out.println("Ошибка при поиске User по параметрам=" + sWhere);
+            e.printStackTrace();
+        }
+        return (res == null) ? new ArrayList<>() : res;
     }
 }

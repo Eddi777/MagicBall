@@ -10,6 +10,7 @@ import ru.sharipov.dto.PredictionMap;
 import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.PredictorValue;
 import ru.sharipov.entity.User;
+import ru.sharipov.lib.jSoupUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public class WeatherImplService extends CommonPredictorService {
     @Override
     public PredictionMap getPredictions(Predictor predictor, User user) {
 
-        if (!checkService(predictor)) {
+        if (jSoupUtils.isCorrectService(predictor)) {
             System.out.printf("ВНИМАЕНИЕ: Сервис %s не прошел проверку корректности", PREDICTOR);
             return new PredictionMap();
         }
@@ -54,7 +55,7 @@ public class WeatherImplService extends CommonPredictorService {
     }
 
     @Override
-    public String getPredictionName() {
+    public String getPredictorName() {
         return PREDICTOR;
     }
 
@@ -131,22 +132,6 @@ public class WeatherImplService extends CommonPredictorService {
             map.put(elem[0].trim(), selector);
         }
         return map;
-    }
-
-    //Проверка правильности работы сервиса, true = сервис возвращает правильный ответ
-    private boolean checkService(Predictor predictor) {
-        String url = predictor.getHost();
-
-        Element response = null;
-        try {
-            response = Jsoup.connect(url).get().head();
-        } catch (IOException ignored) {
-        }
-        if (response == null) {
-            return false;
-        }
-        return response.getElementsByTag("Title").stream()
-                .anyMatch(t -> t.toString().contains(predictor.getCheckData()));
     }
 
     // Получение кода города проживания

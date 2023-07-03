@@ -29,7 +29,7 @@ public class PredictorValue {
     private String tags; //Тэги для предсказания (разделитель - запятая)
 
     @Column(name="SERVICE", length = 400)
-    private String service; //Тэги для предсказания (разделитель - запятая)
+    private String service; //Вспомогательное сервисное поле
 
     public Long getValueId() {
         return valueId;
