@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Set;
 
 @Entity
@@ -34,6 +35,13 @@ public class User {
     private String livingCity;
     @Column(name = "TG_ID", length = 25)
     private String telegramId;
+    @Column(name="BIRTH_CITY_LONGITUDE")
+    private String birthCityLongitude;
+    @Column(name="BIRTH_CITY_LATITUDE")
+    private String birthCityLatitude;
+    @Column(name="BIRTH_CITY_TIMEZONE")
+    private String birthCityTimezone;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Request> requests;
 
@@ -101,6 +109,30 @@ public class User {
         this.requests = requests;
     }
 
+    public String getBirthCityLongitude() {
+        return birthCityLongitude;
+    }
+
+    public void setBirthCityLongitude(String birthCityLongitude) {
+        this.birthCityLongitude = birthCityLongitude;
+    }
+
+    public String getBirthCityLatitude() {
+        return birthCityLatitude;
+    }
+
+    public void setBirthCityLatitude(String birthCityLatitude) {
+        this.birthCityLatitude = birthCityLatitude;
+    }
+
+    public String getBirthCityTimezone() {
+        return birthCityTimezone;
+    }
+
+    public void setBirthCityTimezone(String birthCityTimezone) {
+        this.birthCityTimezone = birthCityTimezone;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -111,6 +143,9 @@ public class User {
                 ", birthCity='" + birthCity + '\'' +
                 ", livingCity='" + livingCity + '\'' +
                 ", telegramId='" + telegramId + '\'' +
+                ", birthCityLongitude='" + birthCityLongitude + '\'' +
+                ", birthCityLatitude='" + birthCityLatitude + '\'' +
+                ", birthCityTimezone='" + birthCityTimezone + '\'' +
                 '}';
     }
 }

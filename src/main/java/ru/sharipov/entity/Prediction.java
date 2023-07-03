@@ -1,20 +1,17 @@
 package ru.sharipov.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import ru.sharipov.emun.PredictionEncode;
-
-import java.util.Arrays;
-import java.util.Set;
+import ru.sharipov.enums.TextSentiment;
 
 @Entity
 @Table(name = "PREDICTIONS")
@@ -27,10 +24,11 @@ public class Prediction {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "REQUEST_ID", nullable = false)
     private Request request; //ИД запроса
-    @Column(name = "PREDICTION", nullable = false, length = 1000)
+    @Column(name = "PREDICTION", nullable = false, length = 2000)
     private String prediction; //Текст предсказания
     @Column(name = "PREDICTION_ENCODE", length = 10)
-    private String predictionEncode; //Анализ предсказания
+    @Enumerated(EnumType.STRING)
+    private TextSentiment predictionEncode; //Анализ предсказания
     @Column(name = "TAGS", length = 500)
     private String tags; //Тэги предсказания
 
@@ -55,15 +53,18 @@ public class Prediction {
     }
 
     public void setPrediction(String prediction) {
+        if (prediction.length() > 2000) {
+            prediction = prediction.substring(0, 1999);
+        }
         this.prediction = prediction;
     }
 
-    public PredictionEncode getPredictionEncode() {
-        return PredictionEncode.encode(this.predictionEncode);
+    public TextSentiment getPredictionEncode() {
+        return this.predictionEncode;
     }
 
-    public void setPredictionEncode(PredictionEncode predictionEncode) {
-        this.predictionEncode = predictionEncode.getText();
+    public void setPredictionEncode(TextSentiment predictionEncode) {
+        this.predictionEncode = predictionEncode;
     }
 
     public String getTags() {

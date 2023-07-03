@@ -10,18 +10,29 @@ import ru.sharipov.entity.Request;
 import ru.sharipov.entity.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class PredictionDaoServiceImpl implements DaoService<Prediction> {
 
     private static SessionFactory sessionFactory;
 
-    public PredictionDaoServiceImpl() {
-        sessionFactory = new Configuration()
-                .addAnnotatedClass(Prediction.class)
-                .addAnnotatedClass(Request.class)
-                .addAnnotatedClass(User.class)
-                .buildSessionFactory();
+    private static DaoService<Prediction> instance;
+
+
+    private PredictionDaoServiceImpl() {
+    }
+
+    public static synchronized DaoService<Prediction> getInstance() {
+        if (instance == null) {
+            instance = new PredictionDaoServiceImpl();
+            sessionFactory = new Configuration()
+                    .addAnnotatedClass(Prediction.class)
+                    .addAnnotatedClass(Request.class)
+                    .addAnnotatedClass(User.class)
+                    .buildSessionFactory();
+        }
+        return instance;
     }
 
     @Override
@@ -37,7 +48,7 @@ public class PredictionDaoServiceImpl implements DaoService<Prediction> {
 
     @Override
     public Optional<Prediction> getByName(String name) {
-        throw new RuntimeException("Функционал RequestDaoServiceImpl.getByName не реализован");
+        throw new RuntimeException("Функционал PredictionDaoServiceImpl.getByName не реализован");
     }
 
     @Override
@@ -63,12 +74,17 @@ public class PredictionDaoServiceImpl implements DaoService<Prediction> {
     }
 
     @Override
-    public void update(Prediction prediction, String[] params) {
-        throw new RuntimeException("Функционал RequestDaoServiceImpl.update не реализован");
+    public void update(Prediction prediction) {
+        throw new RuntimeException("Функционал PredictionDaoServiceImpl.update не реализован");
     }
 
     @Override
     public void delete(Prediction prediction) {
-        throw new RuntimeException("Функционал RequestDaoServiceImpl.delete не реализован");
+        throw new RuntimeException("Функционал PredictionDaoServiceImpl.delete не реализован");
+    }
+
+    @Override
+    public Optional<Prediction> getAnyByParameters(Map<String, String> parameters) {
+        throw new RuntimeException("Функционал PredictionDaoServiceImpl.getAny... не реализован");
     }
 }

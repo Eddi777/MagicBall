@@ -1,7 +1,6 @@
 package ru.sharipov.predictor;
 
 import com.google.auto.service.AutoService;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,7 +8,6 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.sharipov.dto.PredictionDto;
@@ -18,6 +16,8 @@ import ru.sharipov.emun.PredictionDay;
 import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.PredictorValue;
 import ru.sharipov.entity.User;
+import ru.sharipov.lib.UserUtils;
+import ru.sharipov.lib.WebDriverUtil;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -30,37 +30,38 @@ import java.util.regex.Pattern;
 
 @AutoService(PredictorService.class)
 public class AstraZetPredictorImplService extends CommonPredictorService {
+
+    private static final UserUtils userUtils = new UserUtils();
     private static final String PREDICTOR = "AstroZet";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter FORMATTER_PARSE = DateTimeFormatter.ofPattern("dd MM yyyy");
 
-
     @Override
     public PredictionMap getPredictions(Predictor predictor, User user) {
-        String page = getPageData(predictor, user);
+        userUtils.fillCityCoordinatesAndTimezone(user);
+        String page = getPageData(predictor, user, 1);
         if (page.equals("")) {
             return new PredictionMap();
         }
         return parsePage(page, predictor);
     }
+
     @Override
     public String getPredictionName() {
         return PREDICTOR;
     }
 
-    private String getPageData(Predictor predictor, User user) {
+    private String getPageData(Predictor predictor, User user, int step) {
+        if (step == 2) {
+            return "";
+        }
+        final WebDriver driver = WebDriverUtil.getDriver();
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 
-        WebDriverManager.chromedriver().setup();
-        WebDriver driver = new ChromeDriver();
-        String page = "";
+        String page;
+        driver.get(predictor.getHost());
+
         try {
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-            driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-
-            driver.get(predictor.getHost());
-
             WebElement form = driver.findElement(By.id("horoscope_week"));
 
             //Check page correctness
@@ -91,15 +92,39 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
 
             wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.className("forecast-bottom"))));
             page = driver.getPageSource();
-        } catch (IllegalAccessException e) {
-            System.out.println(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
+            page = getPageDateCaseOfError(driver, wait, user);
         } finally {
+            driver.get("C:\\Users\\eduar\\IdeaProjects\\MagicBall\\.gitignore");
             driver.quit();
+        }
+
+        if (page == null) {
+            System.out.printf("Получение аспектов предиктора %s не удалось, повторный запрос для пользователя %s",
+                    PREDICTOR, user);
+            page = getPageData(predictor, user, ++step);
+        }
+
+        return page;
+    }
+
+    private String getPageDateCaseOfError(WebDriver driver, WebDriverWait wait, User user) {
+        String page = "";
+        try {
+            WebElement form = driver.findElement(By.id("horoscope_week"));
+
+            form.findElement(By.className("manual_input")).click();
+            form.findElement(By.id("latitude")).sendKeys(user.getBirthCityLatitude());
+            form.findElement(By.id("longitude")).sendKeys(user.getBirthCityLongitude());
+            form.findElement(By.id("time_correction")).sendKeys(user.getBirthCityTimezone());
+            form.submit();
+            wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.className("forecast-bottom"))));
+            page = driver.getPageSource();
+        } catch (Exception ignored) {
         }
         return page;
     }
+
 
     private PredictionMap parsePage(String htmlPage, Predictor predictor) {
         PredictionMap map = new PredictionMap();
@@ -131,17 +156,35 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
                 continue;
             }
             List<PredictionDto> preds = new ArrayList<>();
+
             for (PredictorValue value : predictor.getValues()) {
                 Pattern pattern = Pattern.compile(value.getRegex());
                 Matcher matcher = pattern.matcher(e.toString());
+
+                String header = null;
+                String body = null;
                 while (matcher.find()) {
-                    PredictionDto pred = new PredictionDto();
-                    pred.setPredictor(PREDICTOR);
-                    pred.addTag(day.getTag());
-                    pred.addTag("#" + PREDICTOR);
-                    pred.addAllTags(Set.of(value.getTags().split(",")));
-                    pred.setPrediction(matcher.group(1));
-                    preds.add(pred);
+                    if (header == null) {
+                        header = matcher.group("header");
+                    }
+                    if (body == null) {
+                        body = matcher.group("body");
+                    }
+                    if (body == null || header==null) {
+                        continue;
+                    }
+
+                    String prediction = header + ": " + body;
+                    PredictionDto predDto = new PredictionDto();
+                    predDto.setPredictor(PREDICTOR);
+                    predDto.addTag(day.getTag());
+                    predDto.addTag("#" + PREDICTOR);
+                    predDto.addAllTags(Set.of(value.getTags().split(",")));
+                    predDto.setPrediction(prediction);
+                    predDto.setSentiment(classify(prediction));
+                    preds.add(predDto);
+                    header = null;
+                    body = null;
                 }
             }
             if (!preds.isEmpty()) {

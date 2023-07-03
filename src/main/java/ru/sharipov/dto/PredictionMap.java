@@ -1,7 +1,6 @@
 package ru.sharipov.dto;
 
 import ru.sharipov.emun.PredictionDay;
-import ru.sharipov.entity.Prediction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class PredictionMap {
         this.map.get(day).addAll(predictions);
     }
 
-    public void merge (PredictionMap map) {
+    public void merge(PredictionMap map) {
         map.keySet().forEach(k -> this.addAll(k, map.get(k)));
     }
 

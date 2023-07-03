@@ -1,6 +1,7 @@
 package ru.sharipov.dao;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface DaoService<T> {
@@ -12,7 +13,20 @@ public interface DaoService<T> {
 
     void save(T t);
 
-    void update(T t, String[] params);
+    void update(T t);
 
     void delete(T t);
+
+    Optional<T> getAnyByParameters(Map<String, String> parameters);
+
+    default String collectHqlWhereByParameters(Map<String, String> parameters){
+        StringBuilder sb = new StringBuilder();
+        parameters.keySet().forEach(key -> {
+            sb.append((sb.length() == 0) ? "" : " AND ");
+            sb.append(key);
+            sb.append("=");
+            sb.append(parameters.get(key));
+        });
+    return sb.toString();
+    }
 }

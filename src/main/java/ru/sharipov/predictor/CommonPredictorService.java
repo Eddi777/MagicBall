@@ -1,8 +1,10 @@
 package ru.sharipov.predictor;
 
+import ru.sharipov.TextClassifier;
 import ru.sharipov.dto.PredictionMap;
 import ru.sharipov.emun.PredictionDay;
 import ru.sharipov.entity.Predictor;
+import ru.sharipov.enums.TextSentiment;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -10,6 +12,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public abstract class CommonPredictorService implements PredictorService {
+
+    private static final TextClassifier textClassifier = new TextClassifier();
 
     protected PredictionMap parsePageByBeautifulSoup(String htmlPage, Predictor predictor) {
         return new PredictionMap();
@@ -32,5 +36,9 @@ public abstract class CommonPredictorService implements PredictorService {
         return Arrays.stream(tagS)
                 .map(String::trim)
                 .collect(Collectors.toSet());
+    }
+
+    protected static TextSentiment classify(String prediction) {
+        return textClassifier.analyse(prediction);
     }
 }

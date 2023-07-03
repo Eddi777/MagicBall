@@ -1,5 +1,6 @@
 package ru.sharipov.lib;
 
+import ru.sharipov.dao.DaoService;
 import ru.sharipov.dao.UserDaoServiceImpl;
 import ru.sharipov.entity.User;
 
@@ -8,8 +9,9 @@ import java.time.LocalTime;
 
 public class TestUserCreateUtil {
 
+    private static final DaoService<User> userService = UserDaoServiceImpl.getInstance();
+
     public void createTestUsers(LocalDate starDate, LocalDate endDate, int stepDays) {
-        UserDaoServiceImpl userDaoService = new UserDaoServiceImpl();
 
         for (LocalDate date = starDate; date.isBefore(endDate); date = date.plusDays(stepDays)) {
             User user = new User();
@@ -18,7 +20,7 @@ public class TestUserCreateUtil {
             user.setBirthDay(date);
             user.setBirthTime(LocalTime.of(1, 0));
             user.setLivingCity("Москва");
-            userDaoService.save(user);
+            userService.save(user);
         }
     }
 }

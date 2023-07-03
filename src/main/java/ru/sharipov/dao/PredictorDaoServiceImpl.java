@@ -4,22 +4,37 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
+import ru.sharipov.entity.Prediction;
 import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.PredictorValue;
+import ru.sharipov.entity.Request;
+import ru.sharipov.entity.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class PredictorDaoServiceImpl implements DaoService<Predictor>{
 
     private static SessionFactory sessionFactory;
+    private static DaoService<Predictor> instance;
 
-    public PredictorDaoServiceImpl() {
-        sessionFactory = new Configuration()
-                .addAnnotatedClass(Predictor.class)
-                .addAnnotatedClass(PredictorValue.class)
-                .buildSessionFactory();
+
+    private PredictorDaoServiceImpl() {
     }
+
+    public static synchronized DaoService<Predictor> getInstance() {
+        if (instance == null) {
+            instance = new PredictorDaoServiceImpl();
+            sessionFactory = new Configuration()
+                    .addAnnotatedClass(Predictor.class)
+                    .addAnnotatedClass(PredictorValue.class)
+                    .buildSessionFactory();
+        }
+        return instance;
+    }
+
+
     @Override
     public Optional<Predictor> getById(long id) {
         return Optional.empty();
@@ -44,16 +59,22 @@ public class PredictorDaoServiceImpl implements DaoService<Predictor>{
 
     @Override
     public void save(Predictor predictor) {
-
+        throw new RuntimeException("Функционал PredictorDaoServiceImpl.save не реализован");
     }
 
     @Override
-    public void update(Predictor predictor, String[] params) {
+    public void update(Predictor predictor) {
+        throw new RuntimeException("Функционал PredictorDaoServiceImpl.update не реализован");
 
     }
 
     @Override
     public void delete(Predictor predictor) {
+        throw new RuntimeException("Функционал PredictorDaoServiceImpl.delete не реализован");
+    }
 
+    @Override
+    public Optional<Predictor> getAnyByParameters(Map<String, String> parameters) {
+        throw new RuntimeException("Функционал PredictorDaoServiceImpl.getAny... не реализован");
     }
 }

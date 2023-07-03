@@ -12,9 +12,16 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <hibernate.version>6.1.7.Final</hibernate.version>
+        <text.classifier.version>1.0.0</text.classifier.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>ru.sharipov</groupId>
+            <artifactId>TextClassifier</artifactId>
+            <version>${text.classifier.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>

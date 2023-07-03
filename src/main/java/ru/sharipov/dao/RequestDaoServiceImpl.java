@@ -1,5 +1,6 @@
 package ru.sharipov.dao;
 
+import org.bouncycastle.cert.ocsp.Req;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -9,18 +10,27 @@ import ru.sharipov.entity.Request;
 import ru.sharipov.entity.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class RequestDaoServiceImpl implements DaoService<Request> {
 
     private static SessionFactory sessionFactory;
+    private static DaoService<Request> instance;
 
-    public RequestDaoServiceImpl() {
-        sessionFactory = new Configuration()
-                .addAnnotatedClass(Request.class)
-                .addAnnotatedClass(Prediction.class)
-                .addAnnotatedClass(User.class)
-                .buildSessionFactory();
+    private RequestDaoServiceImpl() {
+    }
+
+    public static synchronized DaoService<Request> getInstance() {
+        if (instance == null) {
+            instance = new RequestDaoServiceImpl();
+            sessionFactory = new Configuration()
+                    .addAnnotatedClass(Request.class)
+                    .addAnnotatedClass(Prediction.class)
+                    .addAnnotatedClass(User.class)
+                    .buildSessionFactory();
+        }
+        return instance;
     }
 
     @Override
@@ -62,12 +72,17 @@ public class RequestDaoServiceImpl implements DaoService<Request> {
     }
 
     @Override
-    public void update(Request request, String[] params) {
+    public void update(Request request) {
         throw new RuntimeException("Функционал RequestDaoServiceImpl.update не реализован");
     }
 
     @Override
     public void delete(Request request) {
+        throw new RuntimeException("Функционал RequestDaoServiceImpl.delete не реализован");
+    }
+
+    @Override
+    public Optional<Request> getAnyByParameters(Map<String, String> parameters) {
         throw new RuntimeException("Функционал RequestDaoServiceImpl.delete не реализован");
     }
 }

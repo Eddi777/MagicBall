@@ -1,6 +1,8 @@
 package ru.sharipov.dto;
 
+import ru.sharipov.TextClassifier;
 import ru.sharipov.entity.Request;
+import ru.sharipov.enums.TextSentiment;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ public class PredictionDto {
     private Set<String> tags = new HashSet<>();
     private Request request;
 
+    private TextSentiment sentiment;
     public String getPredictor() {
         return predictor;
     }
@@ -53,12 +56,21 @@ public class PredictionDto {
         this.tags = tags;
     }
 
+    public TextSentiment getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(TextSentiment sentiment) {
+        this.sentiment = sentiment;
+    }
+
     @Override
     public String toString() {
         return "Prediction{" +
                 "predictor='" + predictor + '\'' +
                 ", prediction='" + prediction + '\'' +
+                ", sentiment=" + sentiment + '\'' +
                 ", tags=" + Arrays.toString(tags.toArray()) +
-                '}';
+                '}' + '\n';
     }
 }

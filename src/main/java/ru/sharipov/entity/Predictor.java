@@ -25,10 +25,12 @@ public class Predictor {
     private String name; //Имя астропрогноза, уникальное значение
     @Column(name = "COMMENT", length = 500)
     private String comment; //комментарий
-    @Column(name = "HOST", nullable = false, length = 50)
+    @Column(name = "HOST", nullable = false, length = 500)
     private String host; //Хост источника
     @Column(name = "CHECK_DATA", length = 500)
     private String checkData; //Контрольная строка для проверки правильности ответа источника (напр Title)
+    @Column(name="IS_SUPPORT_LINK", length = 1)
+    private String isSupport;
     @OneToMany(mappedBy = "predictor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<PredictorValue> values;
 
@@ -79,6 +81,15 @@ public class Predictor {
     public void setValues(Set<PredictorValue> values) {
         this.values = values;
     }
+
+    public boolean isSupportLink() {
+        return this.isSupport.equals("Y");
+    }
+
+    public void setSupportLink(boolean isSupport) {
+        this.isSupport = (isSupport) ? "Y" : "N";
+    }
+
 
     @Override
     public String toString() {
