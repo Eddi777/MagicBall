@@ -28,16 +28,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @AutoService(PredictorService.class)
-public class BreusSchoolPredictorImplService extends CommonPredictorService {
+public class SimplePredictorImplService extends CommonPredictorService {
 
     private static final UserUtils userUtils = new UserUtils();
-    private static final String PREDICTOR = "BreusSchool";
+    private static final String PREDICTOR = "SimpleJSoupService";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     //    private static final DateTimeFormatter FORMATTER_PARSE = DateTimeFormatter.ofPattern("dd MM yyyy");
     private User user;
-
     @Override
-    public PredictionMap getPredictions( User user) {
+    public PredictionMap getPredictions(User user) {
         userUtils.fillCityCoordinatesAndTimezone(user);
         this.user = user;
 

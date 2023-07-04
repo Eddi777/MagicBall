@@ -10,6 +10,8 @@ import ru.sharipov.dto.PredictionMap;
 import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.PredictorValue;
 import ru.sharipov.entity.User;
+import ru.sharipov.lib.PredictorUtils;
+import ru.sharipov.lib.UserUtils;
 import ru.sharipov.lib.jSoupUtils;
 
 import java.io.IOException;
@@ -24,12 +26,24 @@ import java.util.stream.Collectors;
 @AutoService(PredictorService.class)
 public class WeatherImplService extends CommonPredictorService {
     private static final String PREDICTOR = "Weather";
+    private static final UserUtils userUtils = new UserUtils();
+
+    private User user;
 
     @Override
-    public PredictionMap getPredictions(Predictor predictor, User user) {
+    public PredictionMap getPredictions(User user) {
+        userUtils.fillCityCoordinatesAndTimezone(user);
+        this.user = user;
 
+        PredictionMap map = new PredictionMap();
+        PredictorUtils.getPredictor(PREDICTOR).stream()
+                .map(this::getSinglePredictorPredictions)
+                .forEach(map::merge);
+        return map;
+    }
+
+    private PredictionMap getSinglePredictorPredictions(Predictor predictor) {
         if (jSoupUtils.isCorrectService(predictor)) {
-            System.out.printf("ВНИМАЕНИЕ: Сервис %s не прошел проверку корректности", PREDICTOR);
             return new PredictionMap();
         }
 
@@ -55,9 +69,10 @@ public class WeatherImplService extends CommonPredictorService {
     }
 
     @Override
-    public String getPredictorName() {
+    public String getPredictorServiceName() {
         return PREDICTOR;
     }
+
 
     //Работа с сервисом и построение карты погодных аспектов
     private PredictionMap getPredictionMap(Predictor predictor, String cityCode) {

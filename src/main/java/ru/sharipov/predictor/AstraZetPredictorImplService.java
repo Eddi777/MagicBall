@@ -16,6 +16,7 @@ import ru.sharipov.emun.PredictionDay;
 import ru.sharipov.entity.Predictor;
 import ru.sharipov.entity.PredictorValue;
 import ru.sharipov.entity.User;
+import ru.sharipov.lib.PredictorUtils;
 import ru.sharipov.lib.UserUtils;
 import ru.sharipov.lib.WebDriverUtil;
 
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,10 +37,27 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
     private static final String PREDICTOR = "AstraZet";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter FORMATTER_PARSE = DateTimeFormatter.ofPattern("dd MM yyyy");
+    private User user;
+
 
     @Override
-    public PredictionMap getPredictions(Predictor predictor, User user) {
+    public PredictionMap getPredictions(User user) {
         userUtils.fillCityCoordinatesAndTimezone(user);
+        this.user = user;
+
+        PredictionMap map = new PredictionMap();
+        PredictorUtils.getPredictor(PREDICTOR).stream()
+                .map(this::getSinglePredictorPredictions)
+                .forEach(map::merge);
+        return map;
+    }
+
+    @Override
+    public String getPredictorServiceName() {
+        return PREDICTOR;
+    }
+
+    private PredictionMap getSinglePredictorPredictions(Predictor predictor) {
         String page = getPageData(predictor, user, 1);
         if (page.equals("")) {
             return new PredictionMap();
@@ -46,10 +65,6 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
         return parsePage(page, predictor);
     }
 
-    @Override
-    public String getPredictorName() {
-        return PREDICTOR;
-    }
 
     private String getPageData(Predictor predictor, User user, int step) {
         if (step == 2) {
@@ -170,7 +185,7 @@ public class AstraZetPredictorImplService extends CommonPredictorService {
                     if (body == null) {
                         body = matcher.group("body");
                     }
-                    if (body == null || header==null) {
+                    if (body == null || header == null) {
                         continue;
                     }
 
